@@ -1,0 +1,10 @@
+L'application Othello (controleur du jeu et IA) est à réaliser en C#/.Net  sous la forme d'une DLL (assemblage)
+
+Intégrez à votre solution l'interface Iplayable.DLL   (ne pas la recompiler!)
+
+Pour que l'appli de tournoi trouve votre assemblage avec l'IA, il faudra respecter la convention de nommage suivante:
+
+- votre classe doit référencer et implémenter IPlayable
+- votre classe doit avoir "Board" dans son nom  (p.ex. "OthelloBoard", "TheBoard", "MyBoard", ...)
+- votre classe doit avoir un constructeur par défaut implémenté
+- votre assemblage doit commencer par "Othello" (p.ex. "Othello.dll", "OthelloGroupe2.dll", ...)

@@ -1,0 +1,1 @@
+ConsoleTestDLLOthello 0 SHOW

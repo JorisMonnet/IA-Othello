@@ -1,0 +1,24 @@
+L'application Othello réalisée en XAML/C# est à rendre avant la rentrée (08 janvier)
+
+Intégrez à votre solution l'interface Iplayable.DLL   (ne pas la recompiler!)
+
+
+
+Pour que l'appli de tournoi trouve votre assemblage avec l'IA, il faut respecter la convention de nommage suivante:
+
+- votre classe IA doit référencer et implémenter IPlayable
+- votre classe doit avoir "Board" dans son nom  (p.ex. "OthelloBoard", "TheBoard", "MyBoard", ...)
+- votre classe doit avoir un constructeur par défaut implémenté
+- votre assemblage doit commencer par "Othello" (p.ex. "Othello.dll", "OthelloGroupe2.dll", ...)
+
+Pour Visual Studio 2019, il est nécessaire de compléter la config du projet avec <runtime> pour autoriser le chargement dynamique des IA externe:
+
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <startup>
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.6.1"/>
+    </startup>
+    <runtime>
+        <loadFromRemoteSources enabled="true"/>
+    </runtime>
+</configuration>
