@@ -77,7 +77,43 @@ namespace IAOthelloMonnetPaysant
       
         bool IPlayable.IPlayable.IsPlayable(int column, int line, bool isWhite)
         {
-            throw new NotImplementedException();
+            if (board[column, line] != (int)SquareState.EMPTY)
+            {
+                return false;
+            }
+            bool result = false;
+            int c = column;
+            int l = line;
+
+            for (int dLine = -1; dLine <= 1; dLine++)
+            {
+                for (int dCol = -1; dCol <= 1; dCol++)
+                {
+                    c = column + dCol;
+                    l = line + dLine;
+                    if ((c < BOARDWIDTH) && (c >= 0) && (l < BOARDHEIGHT) && (l >= 0)
+                        && (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE)))
+                    {
+                        bool breakBool = true;
+                        while (((c + dCol) < BOARDWIDTH) && (c + dCol >= 0) &&
+                                  ((l + dLine) < BOARDHEIGHT) && ((l + dLine >= 0)) && breakBool)
+                        {
+                            c += dCol;
+                            l += dLine;
+                            if (board[c, l] == (int)((!isWhite) ? SquareState.BLACK : SquareState.WHITE))
+                            {
+                                result = true;
+                                breakBool = false;
+                            }
+                            else if (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE))
+                                breakBool = true;
+                            else if (board[c, l] == (int)SquareState.EMPTY)
+                                breakBool = false;
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         bool IPlayable.IPlayable.PlayMove(int column, int line, bool isWhite)
