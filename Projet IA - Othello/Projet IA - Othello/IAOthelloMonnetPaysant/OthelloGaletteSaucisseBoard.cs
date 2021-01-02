@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IAOthelloMonnetPaysant
 {
@@ -30,6 +27,7 @@ namespace IAOthelloMonnetPaysant
         const int BOARDWIDTH = 9;
         const int BOARDHEIGHT = 7;
         const int ALPHAORBETA = 1;
+
         private int whiteScore = 0;
         private int blackScore = 0;
         private int roundCounting = 0;
@@ -54,7 +52,7 @@ namespace IAOthelloMonnetPaysant
 
         public string GetName()
         {
-            return "OthelloGaletteSaucisse";
+            return "Galette-Saucisse Squad ";
         }
         public int GetBlackScore()
         {
@@ -104,6 +102,8 @@ namespace IAOthelloMonnetPaysant
             return node.move;
         }
 
+
+
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             if (board[column, line] != (int)SquareState.EMPTY)
@@ -124,8 +124,8 @@ namespace IAOthelloMonnetPaysant
                         && (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE)))
                     {
                         bool breakBool = true;
-                        while (((c + dCol) < BOARDWIDTH) && (c + dCol >= 0) &&
-                                  ((l + dLine) < BOARDHEIGHT) && ((l + dLine >= 0)) && breakBool)
+                        while ((((c + dCol) < BOARDWIDTH) && (c + dCol >= 0) &&
+                                  ((l + dLine) < BOARDHEIGHT) && ((l + dLine >= 0))) && breakBool)
                         {
                             c += dCol;
                             l += dLine;
@@ -139,7 +139,7 @@ namespace IAOthelloMonnetPaysant
                                 breakBool = true; 
                             }
                             else if (board[c, l] == (int)SquareState.EMPTY)
-                            { 
+                            {
                                 breakBool = false;
                             }
                         }
@@ -268,9 +268,8 @@ namespace IAOthelloMonnetPaysant
             return fitness;
         }
 
-        public List<Tuple<int, int>> GetPossibleMoves(bool whiteTurn, bool show = false)
+        public List<Tuple<int, int>> GetPossibleMoves(bool whiteTurn)
         {
-            char[] colonnes = "ABCDEFGHIJKL".ToCharArray();
             List<Tuple<int, int>> possibleMoves = new List<Tuple<int, int>>();
             for (int i = 0; i < BOARDWIDTH; i++)
                 for (int j = 0; j < BOARDHEIGHT; j++)
