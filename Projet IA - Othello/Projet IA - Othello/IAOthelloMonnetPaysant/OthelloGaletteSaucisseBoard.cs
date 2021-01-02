@@ -9,7 +9,7 @@ namespace IAOthelloMonnetPaysant
     //board square status
     public enum SquareState
     {
-        WHITE=0,BLACK=1,EMPTY=2
+        WHITE=0,BLACK=1,EMPTY=-1
     }
 
     //node of algorith
@@ -37,6 +37,7 @@ namespace IAOthelloMonnetPaysant
 
         bool GameEnd { get; set; }
 
+        //useless comment to test
                 
         public OthelloGaletteSaucisseBoard()
         {
@@ -103,7 +104,6 @@ namespace IAOthelloMonnetPaysant
             return node.move;
         }
 
-      
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             if (board[column, line] != (int)SquareState.EMPTY)

@@ -1,0 +1,8 @@
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\bin\Debug\IPlayable.dll
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csprojAssemblyReference.cache
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csproj.CoreCompileInputs.cache
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csproj.CopyComplete
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\bin\Debug\OthelloGaletteSaucisse.dll
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\bin\Debug\OthelloGaletteSaucisse.pdb
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.dll
+C:\DEV\IA\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.pdb
