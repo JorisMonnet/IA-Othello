@@ -35,7 +35,7 @@ namespace IAOthelloMonnetPaysant
         private int roundCounting = 0;
         private int[,] board = new int[BOARDWIDTH,BOARDHEIGHT];
 
-        bool gameEnd { get; set; }
+        bool GameEnd { get; set; }
 
                 
         public OthelloGaletteSaucisseBoard()
@@ -48,6 +48,7 @@ namespace IAOthelloMonnetPaysant
             board[4, 4] = (int)SquareState.WHITE;
             board[3, 4] = (int)SquareState.BLACK;
             board[4, 3] = (int)SquareState.BLACK;
+            this.ScoreComputing();
         }
 
         string IPlayable.IPlayable.GetName()
@@ -67,7 +68,24 @@ namespace IAOthelloMonnetPaysant
             return board;
         }
 
-       
+        private void ScoreComputing()
+        {
+            whiteScore = 0;
+            blackScore = 0;
+            foreach (var cell in board)
+            {
+                if (cell == (int)SquareState.WHITE)
+                {
+                    whiteScore++;
+                }
+                else if (cell == (int)SquareState.BLACK)
+                {
+                    blackScore++;
+                }
+            }
+            GameEnd = ((whiteScore == 0) || (blackScore == 0) ||
+                        (whiteScore + blackScore == 63));
+        }
 
         Tuple<int, int> IPlayable.IPlayable.GetNextMove(int[,] game, int level, bool whiteTurn)
         {
