@@ -51,19 +51,19 @@ namespace IAOthelloMonnetPaysant
             this.ScoreComputing();
         }
 
-        string IPlayable.IPlayable.GetName()
+        public string GetName()
         {
             return "OthelloGaletteSaucisse";
         }
-        int IPlayable.IPlayable.GetBlackScore()
+        public int GetBlackScore()
         {
             return blackScore;
         }
-        int IPlayable.IPlayable.GetWhiteScore()
+        public int GetWhiteScore()
         {
             return whiteScore;
         }
-        int[,] IPlayable.IPlayable.GetBoard()
+        public int[,] GetBoard()
         {
             return board;
         }
@@ -87,13 +87,13 @@ namespace IAOthelloMonnetPaysant
                         (whiteScore + blackScore == 63));
         }
 
-        Tuple<int, int> IPlayable.IPlayable.GetNextMove(int[,] game, int level, bool whiteTurn)
+        public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             throw new NotImplementedException();
         }
 
       
-        bool IPlayable.IPlayable.IsPlayable(int column, int line, bool isWhite)
+        public bool IsPlayable(int column, int line, bool isWhite)
         {
             if (board[column, line] != (int)SquareState.EMPTY)
             {
@@ -134,9 +134,17 @@ namespace IAOthelloMonnetPaysant
             return result;
         }
 
-        bool IPlayable.IPlayable.PlayMove(int column, int line, bool isWhite)
+        public bool PlayMove(int column, int line, bool isWhite)
         {
-            throw new NotImplementedException();
+            if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
+            { 
+                return false;
+            }
+            if (this.IsPlayable(column, line, isWhite) == false)
+            {
+                return false;
+            }
+            return true;
         }
     }
 
