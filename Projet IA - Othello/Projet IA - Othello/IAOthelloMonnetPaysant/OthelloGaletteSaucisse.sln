@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAOthelloMonnetPaysant", "IAOthelloMonnetPaysant.csproj", "{651C4C11-7296-493F-8CD2-7D3CE2D2B414}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{651C4C11-7296-493F-8CD2-7D3CE2D2B414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{651C4C11-7296-493F-8CD2-7D3CE2D2B414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{651C4C11-7296-493F-8CD2-7D3CE2D2B414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{651C4C11-7296-493F-8CD2-7D3CE2D2B414}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {503A11E7-F82D-4CE5-84C4-332B7F1C2436}
+	EndGlobalSection
+EndGlobal
