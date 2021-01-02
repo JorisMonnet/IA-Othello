@@ -88,7 +88,6 @@ namespace IAOthelloMonnetPaysant
 
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
-            List<Tuple<int, int>> possibleMoves = GetPossibleMoves(whiteTurn);
             int round = 0;
 
             int[,] backupGame = (int[,])game.Clone();
