@@ -96,13 +96,13 @@ namespace IAOthelloMonnetPaysant
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
             int[,] moveEvaluation ={ 
-                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
-                { -10,-5,-1,-1,-1,-1,-1,-5,-10 },
-                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
-                { 2,-1, 0, 1, 1, 1, 0, -1, 2 },
-                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
-                { -10,-5,-2,-2,-2,-2,-2,-5,-10 },
-                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
+                { 400, -10, 20, 20, 20, 20, 20,-10, 400 },
+                { -10,-10,-1,-1,-1,-1,-1,-10,-10 },
+                { 20,-1, 1, 1, 1, 1, 1, -1, 20 },
+                { 20,-1, 1, 1, 1, 1, 1, -1, 20 },
+                { 20,-1, 1, 1, 1, 1, 1, -1, 20 },
+                { -10,-10,-2,-2,-2,-2,-2,-10,-10 },
+                { 400, -10, 20, 20, 20, 20, 20,-10, 400 },
             };
 
             double fitness;
@@ -116,9 +116,40 @@ namespace IAOthelloMonnetPaysant
                 fitness = GetBlackScore();
             }
 
-            
-            fitness *= howMuchToSwipe(move.Item2,move.Item1,whiteTurn);
-            
+            fitness *= (double)((BOARDWIDTH * BOARDHEIGHT) - (roundIterations + round)) / (BOARDWIDTH * BOARDHEIGHT);
+
+            int previousHMTSOponent = HowMuchToSwipeAll( !whiteTurn);
+            int previousLSOponent = LegalState(!whiteTurn);
+
+            int[,] saveMyBoard = (int[,])game.Clone();
+
+                PlayMove(move.Item2, move.Item1, whiteTurn);
+
+                int newHMTSOponent = HowMuchToSwipeAll( !whiteTurn);
+                int newLSOponent = LegalState(!whiteTurn);
+
+
+            this.board = (int[,])saveMyBoard.Clone();
+
+            if(previousHMTSOponent<newHMTSOponent)
+            {
+                //bad move
+                fitness -= 100;
+            }
+            else
+            {
+                fitness += fitness;
+            }
+
+            if(previousLSOponent<newLSOponent)
+            {
+                //bad move
+                fitness -= 100;
+            }
+            else
+            {
+                fitness += 10;
+            }
 
             if (move!=null)
             {
@@ -127,8 +158,37 @@ namespace IAOthelloMonnetPaysant
 
             return fitness;
         }
+        private int LegalState(bool isWhite)
+        {
+            int counter=0;
+            for (int columnIndex = 0; columnIndex < BOARDWIDTH; columnIndex++)
+                for (int lineIndex = 0; lineIndex < BOARDHEIGHT; lineIndex++)
+                {
+                    if (IsPlayable(columnIndex, lineIndex, isWhite))
+                    {
+                        counter++;
+                    }
+                }
+            return counter;
+        }
 
-        private int howMuchToSwipe(int column, int line, bool isWhite)
+
+        private int HowMuchToSwipeAll(bool isWhite)
+        {
+            int counter = 0;
+            for (int columnIndex = 0; columnIndex < BOARDWIDTH; columnIndex++)
+                for (int lineIndex = 0; lineIndex < BOARDHEIGHT; lineIndex++)
+                {
+                    if (IsPlayable(columnIndex, lineIndex, isWhite))
+                    {
+                        counter+=HowMuchToSwipe(columnIndex,lineIndex,isWhite);
+                    }
+                }
+            return counter;
+
+        }
+
+        private int HowMuchToSwipe(int column, int line, bool isWhite)
         {
             if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
             {
@@ -150,14 +210,13 @@ namespace IAOthelloMonnetPaysant
                     if ((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
                         && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
                     {
-                        int counter = 0;
                         while (((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
                                   ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0))
                                    && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
                         {
                             iterationColumnIndex += deltaColumn;
                             iterationLineIndex += deltaLine;
-                            counter++;
+
                             if (board[iterationColumnIndex, iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
                             {
                                 howMuch++;
