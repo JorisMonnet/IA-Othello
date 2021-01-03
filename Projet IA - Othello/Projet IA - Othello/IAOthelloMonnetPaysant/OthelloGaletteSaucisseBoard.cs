@@ -3,13 +3,322 @@ using System.Collections.Generic;
 
 namespace IAOthelloMonnetPaysant
 {
-    //board square status
-    public enum SquareState
+    public class OthelloGaletteSaucisseBoard : IPlayable.IPlayable
     {
-        WHITE=0,BLACK=1,EMPTY=-1
+        const int BOARDWIDTH = 9;
+        const int BOARDHEIGHT = 7;
+        const int WHITEISSTARTING = 1;
+
+        int[,] board = new int[BOARDWIDTH, BOARDHEIGHT];
+        int whiteScore = 0;
+        int blackScore = 0;
+        public bool endGame { get; set; }
+        private int roundIterations = 0;
+
+        public OthelloGaletteSaucisseBoard()
+        {
+            for (int i = 0; i < BOARDWIDTH; i++)
+                for (int j = 0; j < BOARDHEIGHT; j++)
+                    board[i, j] = (int)CellStatus.EMPTY;
+
+            board[3, 3] = (int)CellStatus.WHITE;
+            board[4, 4] = (int)CellStatus.WHITE;
+            board[3, 4] = (int)CellStatus.BLACK;
+            board[4, 3] = (int)CellStatus.BLACK;
+
+            ScoreComputing();
+        }
+
+
+        public int[,] GetBoard()
+        {
+            return (int[,])board;
+        }
+        public int GetWhiteScore()
+        { 
+            return whiteScore; 
+        }
+        public int GetBlackScore() 
+        { 
+            return blackScore;
+        }
+        public string GetName()
+        { 
+            return "Galette-Saucisse Squad ";
+        }
+
+        public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
+        {
+            int round = 0;
+            int[,] saveMyBoard = (int[,])game.Clone();
+
+            var node = AlphaBeta(game, level, whiteTurn, WHITEISSTARTING, int.MaxValue, round);
+
+            this.board = (int[,])saveMyBoard.Clone();
+
+            roundIterations += 1;
+            return node.move;
+        }
+
+        public Node AlphaBeta(int[,] game, int depth, bool whiteTurn, int whoIsPlaying, double parentFitness, int round, Tuple<int, int> lastMove = null, double elderFitness = 0.0)
+        {
+            List<Tuple<int, int>> moves = GetPossibleMove(whiteTurn);
+            double currentFitness = 0.0;
+
+            if (lastMove != null)
+            { 
+                currentFitness = Evaluation(game, !whiteTurn, lastMove, round);
+            }
+            if (depth == 0 || moves.Count == 0 || endGame) 
+            {
+                return new Node(new Tuple<int, int>(-1, -1), currentFitness + elderFitness);
+            }
+
+            Node currentNode = new Node(new Tuple<int, int>(-1, -1), whoIsPlaying * -int.MaxValue);
+
+            foreach (Tuple<int, int> move in moves)
+            {
+                PlayMove(move.Item1, move.Item2, whiteTurn);
+                Node children = AlphaBeta(game,depth - 1,!whiteTurn,-whoIsPlaying,currentNode.fitness,round + 1,move,currentFitness + elderFitness);
+
+                if (children.fitness * whoIsPlaying > currentNode.fitness * whoIsPlaying)
+                {
+                    currentNode.fitness = children.fitness;
+                    currentNode.move = move;
+                }
+            }
+            return currentNode;
+        }
+
+
+        public double Evaluation(int[,] game, bool whiteTurn, Tuple<int, int> move, int round)
+        {
+            //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
+            //also based on http://www.radagast.se/othello/Help/strategy.html
+            int[,] moveEvaluation ={ 
+                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
+                { -10,-5,-1,-1,-1,-1,-1,-5,-10 },
+                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
+                { 2,-1, 0, 1, 1, 1, 0, -1, 2 },
+                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
+                { -10,-5,-2,-2,-2,-2,-2,-5,-10 },
+                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
+            };
+
+            double fitness;
+
+            if (whiteTurn)
+            { 
+                fitness = GetWhiteScore();
+            }
+            else
+            { 
+                fitness = GetBlackScore();
+            }
+
+            
+            fitness *= howMuchToSwipe(move.Item2,move.Item1,whiteTurn);
+            
+
+            if (move!=null)
+            {
+                fitness += moveEvaluation[move.Item2, move.Item1];
+            }
+
+            return fitness;
+        }
+
+        private int howMuchToSwipe(int column, int line, bool isWhite)
+        {
+            if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
+            {
+                return 0;
+            }
+            if (IsPlayable(column, line, isWhite) == false)
+            {
+                return 0;
+            }
+
+            int howMuch = 0;
+            int iterationColumnIndex, iterationLineIndex;
+            for (int deltaLine = -1; deltaLine <= 1; deltaLine++)
+            {
+                for (int deltaColumn = -1; deltaColumn <= 1; deltaColumn++)
+                {
+                    iterationColumnIndex = column + deltaColumn;
+                    iterationLineIndex = line + deltaLine;
+                    if ((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
+                        && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
+                    {
+                        int counter = 0;
+                        while (((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
+                                  ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0))
+                                   && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
+                        {
+                            iterationColumnIndex += deltaColumn;
+                            iterationLineIndex += deltaLine;
+                            counter++;
+                            if (board[iterationColumnIndex, iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
+                            {
+                                howMuch++;
+                            }
+                        }
+                    }
+                }
+            }
+            return howMuch;
+        }
+
+        public bool PlayMove(int column, int line, bool isWhite)
+        {
+            if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
+            { 
+                return false;
+            }
+            if (IsPlayable(column, line, isWhite) == false)
+            { 
+                return false;
+            }
+
+            int iterationColumnIndex, iterationLineIndex; 
+            bool result = false;
+
+            List<Tuple<int, int, int>> cellsToSwitch = new List<Tuple<int, int, int>>();
+            for (int deltaLine = -1; deltaLine <= 1; deltaLine++)
+            {
+                for (int deltaColumn = -1; deltaColumn <= 1; deltaColumn++)
+                {
+                    iterationColumnIndex = column + deltaColumn;
+                    iterationLineIndex = line + deltaLine;
+                    if ((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
+                        && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
+                    {
+                        int counter = 0;
+                        while (((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
+                                  ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0))
+                                   && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE))) 
+                        {
+                            iterationColumnIndex += deltaColumn;
+                            iterationLineIndex += deltaLine;
+                            counter++;
+                            if (board[iterationColumnIndex, iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
+                            {
+                                result = true;
+                                board[column, line] = (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE);
+                                cellsToSwitch.Add(new Tuple<int, int, int>(deltaColumn, deltaLine, counter));
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (var cell in cellsToSwitch)
+            {
+                iterationLineIndex = line;
+                iterationColumnIndex = column;
+                int returnedCells = 0;
+                while (returnedCells++ < cell.Item3)
+                {
+                    iterationColumnIndex += cell.Item1;
+                    iterationLineIndex += cell.Item2;
+                    board[iterationColumnIndex, iterationLineIndex] = (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE);
+                }
+            }
+            ScoreComputing();
+            return result;
+        }
+
+       
+        public bool IsPlayable(int column, int line, bool isWhite)
+        {
+            if (board[column, line] != (int)CellStatus.EMPTY)
+            { 
+                return false;
+            }
+
+            int iterationColumnIndex,iterationLineIndex;
+            bool result = false;
+            for (int deltaLine = -1; deltaLine <= 1; deltaLine++)
+            {
+                for (int deltaColumn = -1; deltaColumn <= 1; deltaColumn++)
+                {
+                    iterationColumnIndex = column + deltaColumn;
+                    iterationLineIndex = line + deltaLine;
+                    if ((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
+                        && (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
+                     {
+                        bool breakBool = true;
+                        while (((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
+                                  ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0)) && breakBool)
+                        {
+                            iterationColumnIndex += deltaColumn;
+                            iterationLineIndex += deltaLine;
+                            if (board[iterationColumnIndex, iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
+                            {
+                                result = true;
+                                breakBool = false;
+                            }
+                            else if (board[iterationColumnIndex, iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE))
+                            { 
+                                breakBool = true;
+                            }
+                            else if (board[iterationColumnIndex, iterationLineIndex] == (int)CellStatus.EMPTY)
+                            { 
+                                breakBool = false;
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        
+        public List<Tuple<int, int>> GetPossibleMove(bool whiteTurn)
+        {            
+            List<Tuple<int, int>> moves = new List<Tuple<int, int>>();
+            for (int columnIndex = 0; columnIndex < BOARDWIDTH; columnIndex++)
+                for (int lineIndex = 0; lineIndex < BOARDHEIGHT; lineIndex++)
+                {
+                    if (IsPlayable(columnIndex, lineIndex, whiteTurn))
+                    {
+                        moves.Add(new Tuple<int, int>(columnIndex, lineIndex));
+                    }
+                }
+            return moves;
+        }
+
+        private void ScoreComputing()
+        {
+            whiteScore = 0;
+            blackScore = 0;
+            int sum = 0;
+            foreach (var cell in board)
+            {
+                if (cell == (int)CellStatus.BLACK)
+                {
+                    blackScore++;
+                    sum++;
+                }
+                else if (cell == (int)CellStatus.WHITE)
+                {
+                    whiteScore++;
+                    sum++;
+                }
+            }
+            //9*7=63
+            endGame = ((sum == 63) || (blackScore == 0) || (whiteScore == 0));
+        }
     }
 
-    //node of algorith
+    //tool objects
+
+    public enum CellStatus
+    {
+        EMPTY = -1,
+        WHITE = 0,
+        BLACK = 1
+    }
+
     public class Node
     {
         public Tuple<int, int> move { get; set; }
@@ -21,265 +330,4 @@ namespace IAOthelloMonnetPaysant
             this.move = move;
         }
     }
-
-    class OthelloGaletteSaucisseBoard : IPlayable.IPlayable
-    {
-        const int BOARDWIDTH = 9;
-        const int BOARDHEIGHT = 7;
-        const int ALPHAORBETA = 1;
-
-        private int whiteScore = 0;
-        private int blackScore = 0;
-        private int roundCounting = 0;
-        private int[,] board = new int[BOARDWIDTH,BOARDHEIGHT];
-
-        bool GameEnd { get; set; }
-
-        //useless comment to test
-                
-        public OthelloGaletteSaucisseBoard()
-        {
-            for (int i = 0; i < BOARDWIDTH; i++)
-                for (int j = 0; j < BOARDHEIGHT; j++)
-                    board[i, j] = (int)SquareState.EMPTY;
-
-            board[3, 3] = (int)SquareState.WHITE;
-            board[4, 4] = (int)SquareState.WHITE;
-            board[3, 4] = (int)SquareState.BLACK;
-            board[4, 3] = (int)SquareState.BLACK;
-            this.ScoreComputing();
-        }
-
-        public string GetName()
-        {
-            return "Galette-Saucisse Squad ";
-        }
-        public int GetBlackScore()
-        {
-            return blackScore;
-        }
-        public int GetWhiteScore()
-        {
-            return whiteScore;
-        }
-        public int[,] GetBoard()
-        {
-            return board;
-        }
-
-        private void ScoreComputing()
-        {
-            whiteScore = 0;
-            blackScore = 0;
-            foreach (var cell in board)
-            {
-                if (cell == (int)SquareState.WHITE)
-                {
-                    whiteScore++;
-                }
-                else if (cell == (int)SquareState.BLACK)
-                {
-                    blackScore++;
-                }
-            }
-            GameEnd = ((whiteScore == 0) || (blackScore == 0) ||
-                        (whiteScore + blackScore == 63));
-        }
-
-        public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
-        {
-            int round = 0;
-
-            int[,] backupGame = (int[,])game.Clone();
-
-            var node = AlphaBeta(game, level, whiteTurn,ALPHAORBETA , int.MaxValue, round);
-
-            this.board = (int[,])backupGame.Clone();
-
-            roundCounting += 1;
-
-            return node.move;
-        }
-
-
-
-        public bool IsPlayable(int column, int line, bool isWhite)
-        {
-            if (board[column, line] != (int)SquareState.EMPTY)
-            {
-                return false;
-            }
-            bool result = false;
-            int c = column;
-            int l = line;
-
-            for (int dLine = -1; dLine <= 1; dLine++)
-            {
-                for (int dCol = -1; dCol <= 1; dCol++)
-                {
-                    c = column + dCol;
-                    l = line + dLine;
-                    if ((c < BOARDWIDTH) && (c >= 0) && (l < BOARDHEIGHT) && (l >= 0)
-                        && (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE)))
-                    {
-                        bool breakBool = true;
-                        while ((((c + dCol) < BOARDWIDTH) && (c + dCol >= 0) &&
-                                  ((l + dLine) < BOARDHEIGHT) && ((l + dLine >= 0))) && breakBool)
-                        {
-                            c += dCol;
-                            l += dLine;
-                            if (board[c, l] == (int)((!isWhite) ? SquareState.BLACK : SquareState.WHITE))
-                            {
-                                result = true;
-                                breakBool = false;
-                            }
-                            else if (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE))
-                            { 
-                                breakBool = true; 
-                            }
-                            else if (board[c, l] == (int)SquareState.EMPTY)
-                            {
-                                breakBool = false;
-                            }
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        public bool PlayMove(int column, int line, bool isWhite)
-        {
-            if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
-            { 
-                return false;
-            }
-            if (this.IsPlayable(column, line, isWhite) == false)
-            {
-                return false;
-            }
-
-            List<Tuple<int, int, int>> cellsToReturn = new List<Tuple<int, int, int>>();
-
-            bool result = false;
-            int c = column;
-            int l = line;
-
-            for (int dLine = -1; dLine <= 1; dLine++)
-            {
-                for (int dCol = -1; dCol <= 1; dCol++)
-                {
-                    c = column + dCol;
-                    l = line + dLine;
-                    if ((c < BOARDWIDTH) && (c >= 0) && (l < BOARDHEIGHT) && (l >= 0)
-                        && (board[c, l] == (int)(isWhite ? SquareState.BLACK : SquareState.WHITE)))
-                    {
-                        int k = 0;
-                        while (((c + dCol) < BOARDWIDTH) && (c + dCol >= 0) &&
-                                  ((l + dLine) < BOARDHEIGHT) && ((l + dLine >= 0)))
-                        {
-                            c += dCol;
-                            l += dLine;
-                            k++;
-
-                            if (board[c, l] == (int)((!isWhite) ? SquareState.BLACK : SquareState.WHITE))
-                            {
-                                result = true;
-                                board[column, line] = (int)((!isWhite) ? SquareState.BLACK : SquareState.WHITE);
-                                cellsToReturn.Add(new Tuple<int, int, int>(dCol, dLine, k));
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (var cell in cellsToReturn)
-            {
-                int iterations = 0;
-                l = line;
-                c = column;
-                while (iterations++ < cell.Item3)
-                {
-                    c += cell.Item1;
-                    l += cell.Item2;
-                    board[c, l] = (int)((!isWhite) ? SquareState.BLACK : SquareState.WHITE);
-                }
-            }
-
-            this.ScoreComputing();
-            return result;
-        }
-    
-        public Node AlphaBeta(int[,] game, int level, bool whiteTurn, int alphaORbeta, double parentFitness, int round, Tuple<int, int> lastMove = null, double pathFitness = 0.0)
-        {
-            List<Tuple<int, int>> possibleMoves = GetPossibleMoves(whiteTurn);
-            double currentNodeFitness = 0.0;
-
-            if (lastMove != null) // The root does not have a fitness
-                currentNodeFitness = Evaluation(game, !whiteTurn, lastMove, round);
-
-            if (level == 0 || possibleMoves.Count == 0 || GameEnd)
-                return new Node(new Tuple<int, int>(-1, -1), currentNodeFitness + pathFitness);
-
-            Node currentNode = new Node(new Tuple<int, int>(-1, -1), alphaORbeta * -int.MaxValue);
-
-            foreach (Tuple<int, int> move in possibleMoves)
-            {
-                PlayMove(move.Item1, move.Item2, whiteTurn);
-                Node children = AlphaBeta(
-                    game, // the game has changed
-                    level - 1, // one step deeper
-                    !whiteTurn, // next player
-                    -alphaORbeta, // min <-> max
-                    currentNode.fitness, // parent's fitness
-                    round + 1, // turn count
-                    move, // move to explore
-                    currentNodeFitness + pathFitness); // path's price
-
-                if (children.fitness * alphaORbeta > currentNode.fitness * alphaORbeta)
-                {
-                    currentNode.fitness = children.fitness;
-                    currentNode.move = move;
-
-                    // If the child has a better absolute fitness than his parent, something's wrong
-                    if (Math.Abs(currentNode.fitness) > Math.Abs(parentFitness))
-                        break;
-                }
-            }
-            return currentNode;
-        }
-        public double Evaluation(int[,] game, bool whiteTurn, Tuple<int, int> move, int round)
-        {
-            double fitness = 0;
-
-            if (whiteTurn)
-            { 
-                fitness = GetWhiteScore();
-            }
-            else
-            { 
-                fitness = GetBlackScore();
-            }
-
-            double coef = (double)((BOARDWIDTH * BOARDHEIGHT) - (roundCounting + round)) / (BOARDWIDTH * BOARDHEIGHT);
-            fitness *= coef;
-
-            return fitness;
-        }
-
-        public List<Tuple<int, int>> GetPossibleMoves(bool whiteTurn)
-        {
-            List<Tuple<int, int>> possibleMoves = new List<Tuple<int, int>>();
-            for (int i = 0; i < BOARDWIDTH; i++)
-                for (int j = 0; j < BOARDHEIGHT; j++)
-                {
-                    if (IsPlayable(i, j, whiteTurn))
-                    {
-                        possibleMoves.Add(new Tuple<int, int>(i, j));
-                    }
-                }
-            return possibleMoves;
-        }
-    }
-
 }
