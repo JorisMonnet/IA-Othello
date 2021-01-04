@@ -15,11 +15,14 @@ namespace IAOthelloMonnetPaysant
         public bool GameEnded { get; set; }
         private int RoundIterations = 0;
 
-        public OthelloGaletteSaucisseBoard()
-        {
+        public OthelloGaletteSaucisseBoard() {
             for(int i = 0;i < BOARDWIDTH;i++)
+            {
                 for(int j = 0;j < BOARDHEIGHT;j++)
+                {
                     board[i,j] = (int)CellStatus.EMPTY;
+                }
+            }
 
             board[3,3] = (int)CellStatus.WHITE;
             board[4,4] = (int)CellStatus.WHITE;
@@ -32,7 +35,7 @@ namespace IAOthelloMonnetPaysant
 
         public int[,] GetBoard()
         {
-            return (int[,])board;
+            return board;
         }
         public int GetWhiteScore()
         {
@@ -49,14 +52,12 @@ namespace IAOthelloMonnetPaysant
 
         public Tuple<int,int> GetNextMove(int[,] game,int level,bool whiteTurn)
         {
-            int round = 0;
             int[,] saveMyBoard = (int[,])game.Clone();
 
-            var node = AlphaBeta(game,level,whiteTurn,WHITEISSTARTING,int.MaxValue,round);
+            var node = AlphaBeta(game,level,whiteTurn,WHITEISSTARTING,int.MaxValue,RoundIterations++);
 
             board = (int[,])saveMyBoard.Clone();
 
-            RoundIterations++;
             return node.Move;
         }
 
@@ -96,29 +97,17 @@ namespace IAOthelloMonnetPaysant
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
             int[,] moveEvaluation ={
-                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
-                { -10,-5,-1,-1,-1,-1,-1,-5,-10 },
+                { 400, 0, 2, 2, 2, 2, 2,0, 400 },
+                { 0,-5,-1,-1,-1,-1,-1,-5,0 },
                 { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
                 { 2,-1, 0, 1, 1, 1, 0, -1, 2 },
                 { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
-                { -10,-5,-2,-2,-2,-2,-2,-5,-10 },
-                { 40, -10, 2, 2, 2, 2, 2,-10, 40 },
+                { 0,-5,-2,-2,-2,-2,-2,-5, 0 },
+                { 400, 0, 2, 2, 2, 2, 2,0, 400 },
             };
 
-            double fitness;
-
-            if(whiteTurn)
-            {
-                fitness = GetWhiteScore();
-            }
-            else
-            {
-                fitness = GetBlackScore();
-            }
-
-
+            double fitness = whiteTurn?GetWhiteScore():GetBlackScore();
             fitness *= HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
-
 
             if(move != null)
             {
@@ -216,8 +205,7 @@ namespace IAOthelloMonnetPaysant
             {
                 iterationLineIndex = line;
                 iterationColumnIndex = column;
-                int returnedCells = 0;
-                while(returnedCells++ < cell.Item3)
+                for(int i = 0;i < cell.Item3;i++)
                 {
                     iterationColumnIndex += cell.Item1;
                     iterationLineIndex += cell.Item2;
@@ -277,6 +265,7 @@ namespace IAOthelloMonnetPaysant
         {
             List<Tuple<int,int>> moves = new List<Tuple<int,int>>();
             for(int columnIndex = 0;columnIndex < BOARDWIDTH;columnIndex++)
+            {
                 for(int lineIndex = 0;lineIndex < BOARDHEIGHT;lineIndex++)
                 {
                     if(IsPlayable(columnIndex,lineIndex,whiteTurn))
@@ -284,6 +273,7 @@ namespace IAOthelloMonnetPaysant
                         moves.Add(new Tuple<int,int>(columnIndex,lineIndex));
                     }
                 }
+            }
             return moves;
         }
 
@@ -291,22 +281,18 @@ namespace IAOthelloMonnetPaysant
         {
             whiteScore = 0;
             blackScore = 0;
-            int sum = 0;
-            foreach(var cell in board)
+            foreach(var cell in board) 
             {
                 if(cell == (int)CellStatus.BLACK)
                 {
                     blackScore++;
-                    sum++;
                 }
                 else if(cell == (int)CellStatus.WHITE)
                 {
                     whiteScore++;
-                    sum++;
                 }
             }
-            //9*7=63
-            GameEnded = ((sum == 63) || (blackScore == 0) || (whiteScore == 0));
+            GameEnded = ((whiteScore+blackScore == BOARDHEIGHT*BOARDWIDTH) || (blackScore == 0) || (whiteScore == 0));
         }
     }
 
@@ -326,8 +312,8 @@ namespace IAOthelloMonnetPaysant
 
         public Node(Tuple<int,int> move,double fitness)
         {
-            this.Fitness = fitness;
-            this.Move = move;
+            Fitness = fitness;
+            Move = move;
         }
     }
 }
