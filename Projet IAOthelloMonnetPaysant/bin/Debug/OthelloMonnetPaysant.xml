@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OthelloMonnetPaysant</name>
+    </assembly>
+    <members>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetBoard">
+            <summary>
+            Returns a reference to a 2D array with the board status
+            </summary>
+            <returns>The 9x7 tiles status</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetWhiteScore">
+            <summary>
+            Returns the number of white tiles on the board
+            </summary>
+            <returns>white score as int</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetBlackScore">
+            <summary>
+            Returns the number of black tiles
+            </summary>
+            <returns>black score as int</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetName">
+            <summary>
+            Returns the IA's name
+            </summary>
+            <returns>IA name string</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetNextMove(System.Int32[0:,0:],System.Int32,System.Boolean)">
+            <summary>
+            Asks the game engine next (valid) move given a game position
+            The board assumes following standard move notation:
+            
+                        A B C D E F G H I
+                    [ ][0 1 2 3 4 5 6 7 8]     (first index)
+                   1 0
+                   2 1
+                   3 2        X
+                   4 3            X
+                   5 4
+                   6 5
+                   7 6
+                  
+                     Column Line
+             E.g.:    D3, F4 game notation will map to {3,2} resp. {5,3}
+            </summary>
+            <param name="game">a 2D board with integer values: 0 for white 1 for black and -1 for empty tiles. First index for the column, second index for the line</param>
+            <param name="level">an integer value to set the level of the IA, 5 normally</param>
+            <param name="whiteTurn">true if white players turn, false otherwise</param>
+            <returns>The column and line indices. Will return {-1,-1} as PASS if no possible move </returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.AlphaBeta(System.Int32[0:,0:],System.Int32,System.Boolean,System.Int32,System.Int32,System.Tuple{System.Int32,System.Int32},System.Double)" -->
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.Evaluation(System.Int32[0:,0:],System.Boolean,System.Tuple{System.Int32,System.Int32},System.Int32)">
+            <summary>
+            check readme.md
+            </summary>
+            <param name="game">board of the game</param>
+            <param name="whiteTurn">true for white move, false for black move</param>
+            <param name="move">move coordinates</param>
+            <param name="round">number of AlphaBeta iterations passed</param>
+            <returns></returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.HowMuchToSwipe(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            count the number of cells to be returned by a move
+            </summary>
+            <param name="column">board of the game</param>
+            <param name="line">move coordinates</param>
+            <param name="isWhite">true for white move, false for black move</param>
+            <returns>number of cells to be returned by a move as int</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.PlayMove(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Will update the board status if the move is valid and return true
+            Will return false otherwise (board is unchanged)
+            </summary>
+            <param name="column">value between 0 and 7</param>
+            <param name="line">value between 0 and 7</param>
+            <param name="isWhite">true for white move, false for black move</param>
+            <returns></returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.IsPlayable(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Returns true if the move is valid for specified color
+            </summary>
+            <param name="column">value between 0 and 8</param>
+            <param name="line">value between 0 and 6</param>
+            <param name="isWhite"></param>
+            <returns>true or false</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.GetPossibleMove(System.Boolean)">
+            <summary>
+            Returns all the coordinates tuple possible for specified color
+            </summary>
+            <param name="whiteTurn"></param>
+            <returns>List of tuple of coordinates</returns>
+        </member>
+        <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.ScoreComputing">
+            <summary>
+            Update the current score
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

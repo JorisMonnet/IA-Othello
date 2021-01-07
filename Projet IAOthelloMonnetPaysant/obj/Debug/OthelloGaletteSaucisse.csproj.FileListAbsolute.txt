@@ -30,3 +30,4 @@ C:\DEV\IA\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\OthelloMonnetPaysan
 C:\DEV\IA\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\OthelloMonnetPaysant.pdb
 C:\DEV\IA\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloMonnetPaysant.dll
 C:\DEV\IA\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloMonnetPaysant.pdb
+C:\DEV\IA\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\OthelloMonnetPaysant.xml

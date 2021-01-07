@@ -17,6 +17,7 @@ namespace IAOthelloMonnetPaysant
 
         public OthelloGaletteSaucisseBoard()
         {
+            //board initialization
             for (int i = 0; i < BOARDWIDTH; i++)
             {
                 for (int j = 0; j < BOARDHEIGHT; j++)
@@ -33,34 +34,85 @@ namespace IAOthelloMonnetPaysant
             ScoreComputing();
         }
 
-
+        /// <summary>
+        /// Returns a reference to a 2D array with the board status
+        /// </summary>
+        /// <returns>The 9x7 tiles status</returns>
         public int[,] GetBoard()
         {
             return board;
         }
+
+        /// <summary>
+        /// Returns the number of white tiles on the board
+        /// </summary>
+        /// <returns>white score as int</returns>
         public int GetWhiteScore()
         {
             return whiteScore;
         }
+        /// <summary>
+        /// Returns the number of black tiles
+        /// </summary>
+        /// <returns>black score as int</returns>
         public int GetBlackScore()
         {
             return blackScore;
         }
+
+        /// <summary>
+        /// Returns the IA's name
+        /// </summary>
+        /// <returns>IA name string</returns>
         public string GetName()
         {
             return "Galette-Saucisse Squad ";
         }
 
+
+        /// <summary>
+        /// Asks the game engine next (valid) move given a game position
+        /// The board assumes following standard move notation:
+        /// 
+        ///             A B C D E F G H I
+        ///         [ ][0 1 2 3 4 5 6 7 8]     (first index)
+        ///        1 0
+        ///        2 1
+        ///        3 2        X
+        ///        4 3            X
+        ///        5 4
+        ///        6 5
+        ///        7 6
+        ///       
+        ///          Column Line
+        ///  E.g.:    D3, F4 game notation will map to {3,2} resp. {5,3}
+        /// </summary>
+        /// <param name="game">a 2D board with integer values: 0 for white 1 for black and -1 for empty tiles. First index for the column, second index for the line</param>
+        /// <param name="level">an integer value to set the level of the IA, 5 normally</param>
+        /// <param name="whiteTurn">true if white players turn, false otherwise</param>
+        /// <returns>The column and line indices. Will return {-1,-1} as PASS if no possible move </returns>
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             int[,] saveMyBoard = (int[,])game.Clone();
-
+           
             var node = AlphaBeta(game, level, whiteTurn, WHITEISSTARTING, 0);
             board = (int[,])saveMyBoard.Clone();
             roundIterations++;
             return node.Move;
         }
 
+
+        /// <summary>
+        /// Returns a node with fitness value & coordinates to be played
+        /// </summary>
+        /// <param name="game">the game board</param>
+        /// <param name="depth">depth of alphaBeta search</param>
+        /// <param name="whiteTurn">true if white players turn, false otherwise</param>
+        /// <param name="whoIsPlaying">whick player as started to play</param>
+        /// <param name="round">number of AlphaBeta iterations passed(needed for recursive call)</param>
+        /// <param name="lastMove">last move coordinates</param>
+        /// <param name="elderFitness">parent's node fitness value</param>
+        /// <returns>a Node wich contains data for next move</returns>
         public Node AlphaBeta(int[,] game, int depth, bool whiteTurn, int whoIsPlaying, int round, Tuple<int, int> lastMove = null, double elderFitness = 0.0)
         {
             List<Tuple<int, int>> moves = GetPossibleMove(whiteTurn);
@@ -94,12 +146,18 @@ namespace IAOthelloMonnetPaysant
             return currentNode;
         }
 
-
+        /// <summary>
+        /// check readme.md
+        /// </summary>
+        /// <param name="game">board of the game</param>
+        /// <param name="whiteTurn">true for white move, false for black move</param>
+        /// <param name="move">move coordinates</param>
+        /// <param name="round">number of AlphaBeta iterations passed</param>
+        /// <returns></returns>
         public double Evaluation(int[,] game, bool whiteTurn, Tuple<int, int> move, int round)
         {
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
-            //try to keep center, corner are good, avoid column and line before border column/line and try to go on the right or the left if white or black
             int[,] moveEvaluation = null;
 
             double fitness = whiteTurn ? GetWhiteScore() : GetBlackScore();
@@ -213,12 +271,19 @@ namespace IAOthelloMonnetPaysant
 
             if (move != null)
             {
-                fitness += 0.2 * HowMuchToSwipe(move.Item2, move.Item1, whiteTurn);
+                fitness +=HowMuchToSwipe(move.Item2, move.Item1, whiteTurn);
             }
 
             return fitness;
         }
 
+        /// <summary>
+        /// count the number of cells to be returned by a move
+        /// </summary>
+        /// <param name="column">board of the game</param>
+        /// <param name="line">move coordinates</param>
+        /// <param name="isWhite">true for white move, false for black move</param>
+        /// <returns>number of cells to be returned by a move as int</returns>
         private int HowMuchToSwipe(int column, int line, bool isWhite)
         {
             if (!IsPlayable(column, line, isWhite))
@@ -254,11 +319,20 @@ namespace IAOthelloMonnetPaysant
             return howMuch;
         }
 
+        /// <summary>
+        /// Will update the board status if the move is valid and return true
+        /// Will return false otherwise (board is unchanged)
+        /// </summary>
+        /// <param name="column">value between 0 and 7</param>
+        /// <param name="line">value between 0 and 7</param>
+        /// <param name="isWhite">true for white move, false for black move</param>
+        /// <returns></returns>
         public bool PlayMove(int column, int line, bool isWhite)
         {
             int iterationColumnIndex, iterationLineIndex;
             bool result = false;
 
+            //get cells to be returned
             List<Tuple<int, int, int>> cellsToSwitch = new List<Tuple<int, int, int>>();
             for (int deltaLine = -1; deltaLine <= 1; deltaLine++)
             {
@@ -287,7 +361,7 @@ namespace IAOthelloMonnetPaysant
                     }
                 }
             }
-
+            //return cells
             foreach (var cell in cellsToSwitch)
             {
                 iterationLineIndex = line;
@@ -305,6 +379,13 @@ namespace IAOthelloMonnetPaysant
         }
 
 
+        /// <summary>
+        /// Returns true if the move is valid for specified color
+        /// </summary>
+        /// <param name="column">value between 0 and 8</param>
+        /// <param name="line">value between 0 and 6</param>
+        /// <param name="isWhite"></param>
+        /// <returns>true or false</returns>
         public bool IsPlayable(int column, int line, bool isWhite)
         {
             if ((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
@@ -342,7 +423,6 @@ namespace IAOthelloMonnetPaysant
                             {
                                 breakBool = false;
                             }
-                            //stop while if cell is empty
                             else if (board[iterationColumnIndex, iterationLineIndex] == (int)CellStatus.EMPTY)
                             {
                                 breakBool = true;
@@ -354,6 +434,12 @@ namespace IAOthelloMonnetPaysant
             return result;
         }
 
+
+        /// <summary>
+        /// Returns all the coordinates tuple possible for specified color
+        /// </summary>
+        /// <param name="whiteTurn"></param>
+        /// <returns>List of tuple of coordinates</returns>
         public List<Tuple<int, int>> GetPossibleMove(bool whiteTurn)
         {
             List<Tuple<int, int>> moves = new List<Tuple<int, int>>();
@@ -370,6 +456,10 @@ namespace IAOthelloMonnetPaysant
             return moves;
         }
 
+        /// <summary>
+        /// Update the current score
+        /// </summary>
+        /// <returns></returns>
         private void ScoreComputing()
         {
             whiteScore = 0;
