@@ -60,7 +60,7 @@
             <param name="whiteTurn">true for white move, false for black move</param>
             <param name="move">move coordinates</param>
             <param name="round">number of AlphaBeta iterations passed</param>
-            <returns></returns>
+            <returns>fitness value</returns>
         </member>
         <member name="M:IAOthelloMonnetPaysant.OthelloGaletteSaucisseBoard.HowMuchToSwipe(System.Int32,System.Int32,System.Boolean)">
             <summary>

@@ -153,7 +153,7 @@ namespace IAOthelloMonnetPaysant
         /// <param name="whiteTurn">true for white move, false for black move</param>
         /// <param name="move">move coordinates</param>
         /// <param name="round">number of AlphaBeta iterations passed</param>
-        /// <returns></returns>
+        /// <returns>fitness value</returns>
         public double Evaluation(int[,] game, bool whiteTurn, Tuple<int, int> move, int round)
         {
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
@@ -269,9 +269,9 @@ namespace IAOthelloMonnetPaysant
                 }
             }
 
-            if (move != null)
+            if (roundIterations>35)
             {
-                fitness +=HowMuchToSwipe(move.Item2, move.Item1, whiteTurn);
+                fitness *= HowMuchToSwipe(move.Item2, move.Item1, whiteTurn);
             }
 
             return fitness;
