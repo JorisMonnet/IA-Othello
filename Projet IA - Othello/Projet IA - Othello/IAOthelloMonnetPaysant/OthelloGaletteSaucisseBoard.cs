@@ -13,7 +13,6 @@ namespace IAOthelloMonnetPaysant
         int whiteScore = 0;
         int blackScore = 0;
         public bool GameEnded { get; set; }
-        private int RoundIterations = 0;
 
         public OthelloGaletteSaucisseBoard()
         {
@@ -55,14 +54,13 @@ namespace IAOthelloMonnetPaysant
         {
             int[,] saveMyBoard = (int[,])game.Clone();
 
-            var node = AlphaBeta(game,level,whiteTurn,WHITEISSTARTING,int.MaxValue,RoundIterations++);
-
+            var node = AlphaBeta(game,level,whiteTurn,WHITEISSTARTING,0);
             board = (int[,])saveMyBoard.Clone();
 
             return node.Move;
         }
 
-        public Node AlphaBeta(int[,] game,int depth,bool whiteTurn,int whoIsPlaying,double parentFitness,int round,Tuple<int,int> lastMove = null,double elderFitness = 0.0)
+        public Node AlphaBeta(int[,] game,int depth,bool whiteTurn,int whoIsPlaying,int round,Tuple<int,int> lastMove = null,double elderFitness = 0.0)
         {
             List<Tuple<int,int>> moves = GetPossibleMove(whiteTurn);
             double currentFitness = 0.0;
@@ -82,7 +80,7 @@ namespace IAOthelloMonnetPaysant
             {
                 if(IsPlayable(move.Item1,move.Item2,whiteTurn))
                     PlayMove(move.Item1,move.Item2,whiteTurn);
-                Node children = AlphaBeta(game,depth - 1,!whiteTurn,-whoIsPlaying,currentNode.Fitness,round + 1,move,currentFitness + elderFitness);
+                Node children = AlphaBeta(game,depth - 1,!whiteTurn,-whoIsPlaying,round + 1,move,currentFitness + elderFitness);
 
                 if(children.Fitness * whoIsPlaying > currentNode.Fitness * whoIsPlaying)
                 {
@@ -98,21 +96,22 @@ namespace IAOthelloMonnetPaysant
         {
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
+            //try to keep center, corner are good, avoid column and line before border column/line and try to go on the right
             int[,] moveEvaluation ={
                 { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
                 { -20,   -20,   -1,     -1,     -1,     -1,     -1,     -20,    -20 },
-                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
-                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
-                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
-                { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    -20 },
+                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
+                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
+                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
+                { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    6   },
                 { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
             };
 
             double fitness = whiteTurn ? GetWhiteScore() : GetBlackScore();
-            fitness *= HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
 
             if(move != null)
             {
+                fitness *= HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
                 fitness += moveEvaluation[move.Item2,move.Item1];
             }
 
@@ -121,10 +120,6 @@ namespace IAOthelloMonnetPaysant
 
         private int HowMuchToSwipe(int column,int line,bool isWhite)
         {
-            if((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
-            {
-                return 0;
-            }
             if(IsPlayable(column,line,isWhite) == false)
             {
                 return 0;
