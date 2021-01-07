@@ -120,7 +120,7 @@ namespace IAOthelloMonnetPaysant
 
         private int HowMuchToSwipe(int column,int line,bool isWhite)
         {
-            if(IsPlayable(column,line,isWhite) == false)
+            if(!IsPlayable(column,line,isWhite))
             {
                 return 0;
             }
@@ -242,6 +242,7 @@ namespace IAOthelloMonnetPaysant
                             {
                                 breakBool = false;
                             }
+                            //stop while if cell is empty
                             else if(board[iterationColumnIndex,iterationLineIndex] == (int)CellStatus.EMPTY)
                             {
                                 breakBool = true;
