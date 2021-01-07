@@ -15,7 +15,8 @@ namespace IAOthelloMonnetPaysant
         public bool GameEnded { get; set; }
         private int RoundIterations = 0;
 
-        public OthelloGaletteSaucisseBoard() {
+        public OthelloGaletteSaucisseBoard()
+        {
             for(int i = 0;i < BOARDWIDTH;i++)
             {
                 for(int j = 0;j < BOARDHEIGHT;j++)
@@ -79,7 +80,8 @@ namespace IAOthelloMonnetPaysant
 
             foreach(Tuple<int,int> move in moves)
             {
-                PlayMove(move.Item1,move.Item2,whiteTurn);
+                if(IsPlayable(move.Item1,move.Item2,whiteTurn))
+                    PlayMove(move.Item1,move.Item2,whiteTurn);
                 Node children = AlphaBeta(game,depth - 1,!whiteTurn,-whoIsPlaying,currentNode.Fitness,round + 1,move,currentFitness + elderFitness);
 
                 if(children.Fitness * whoIsPlaying > currentNode.Fitness * whoIsPlaying)
@@ -97,16 +99,16 @@ namespace IAOthelloMonnetPaysant
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
             int[,] moveEvaluation ={
-                { 400, 0, 2, 2, 2, 2, 2,0, 400 },
-                { 0,-5,-1,-1,-1,-1,-1,-5,0 },
-                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
-                { 2,-1, 0, 1, 1, 1, 0, -1, 2 },
-                { 2,-1, 1, 1, 1, 1, 1, -1, 2 },
-                { 0,-5,-2,-2,-2,-2,-2,-5, 0 },
-                { 400, 0, 2, 2, 2, 2, 2,0, 400 },
+                { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
+                { -20,   -20,   -1,     -1,     -1,     -1,     -1,     -20,    -20 },
+                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
+                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
+                { 2,    -1,     1,      20,     20,     20,     5,      -1,     5   },
+                { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    -20 },
+                { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
             };
 
-            double fitness = whiteTurn?GetWhiteScore():GetBlackScore();
+            double fitness = whiteTurn ? GetWhiteScore() : GetBlackScore();
             fitness *= HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
 
             if(move != null)
@@ -160,15 +162,6 @@ namespace IAOthelloMonnetPaysant
 
         public bool PlayMove(int column,int line,bool isWhite)
         {
-            if((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
-            {
-                return false;
-            }
-            if(IsPlayable(column,line,isWhite) == false)
-            {
-                return false;
-            }
-
             int iterationColumnIndex, iterationLineIndex;
             bool result = false;
 
@@ -219,6 +212,10 @@ namespace IAOthelloMonnetPaysant
 
         public bool IsPlayable(int column,int line,bool isWhite)
         {
+            if((column < 0) || (column >= BOARDWIDTH) || (line < 0) || (line >= BOARDHEIGHT))
+            {
+                return false;
+            }
             if(board[column,line] != (int)CellStatus.EMPTY)
             {
                 return false;
@@ -235,24 +232,24 @@ namespace IAOthelloMonnetPaysant
                     if((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
                         && (board[iterationColumnIndex,iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
                     {
-                        bool breakBool = true;
+                        bool breakBool = false;
                         while(((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
-                                  ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0)) && breakBool)
+                                  ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && (iterationLineIndex + deltaLine >= 0) && !breakBool)
                         {
                             iterationColumnIndex += deltaColumn;
                             iterationLineIndex += deltaLine;
                             if(board[iterationColumnIndex,iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
                             {
                                 result = true;
-                                breakBool = false;
-                            }
-                            else if(board[iterationColumnIndex,iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE))
-                            {
                                 breakBool = true;
+                            }
+                            else if(board[iterationColumnIndex,iterationLineIndex] == (int)((isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
+                            {
+                                breakBool = false;
                             }
                             else if(board[iterationColumnIndex,iterationLineIndex] == (int)CellStatus.EMPTY)
                             {
-                                breakBool = false;
+                                breakBool = true;
                             }
                         }
                     }
@@ -281,7 +278,7 @@ namespace IAOthelloMonnetPaysant
         {
             whiteScore = 0;
             blackScore = 0;
-            foreach(var cell in board) 
+            foreach(var cell in board)
             {
                 if(cell == (int)CellStatus.BLACK)
                 {
@@ -292,7 +289,7 @@ namespace IAOthelloMonnetPaysant
                     whiteScore++;
                 }
             }
-            GameEnded = ((whiteScore+blackScore == BOARDHEIGHT*BOARDWIDTH) || (blackScore == 0) || (whiteScore == 0));
+            GameEnded = ((whiteScore + blackScore == BOARDHEIGHT * BOARDWIDTH) || (blackScore == 0) || (whiteScore == 0));
         }
     }
 
