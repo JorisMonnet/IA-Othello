@@ -14,3 +14,11 @@ C:\Users\Joris\Desktop\3\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOt
 C:\Users\Joris\Desktop\3\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csproj.CopyComplete
 C:\Users\Joris\Desktop\3\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.dll
 C:\Users\Joris\Desktop\3\IA-Othello\Projet IA - Othello\Projet IA - Othello\IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.pdb
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\OthelloGaletteSaucisse.dll
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\OthelloGaletteSaucisse.pdb
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\bin\Debug\IPlayable.dll
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csprojAssemblyReference.cache
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csproj.CoreCompileInputs.cache
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.csproj.CopyComplete
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.dll
+C:\Users\Joris\Desktop\3\IA-Othello\Projet IAOthelloMonnetPaysant\obj\Debug\OthelloGaletteSaucisse.pdb

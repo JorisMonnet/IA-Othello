@@ -12,6 +12,7 @@ namespace IAOthelloMonnetPaysant
         int[,] board = new int[BOARDWIDTH,BOARDHEIGHT];
         int whiteScore = 0;
         int blackScore = 0;
+        int roundIterations = 0;
         public bool GameEnded { get; set; }
 
         public OthelloGaletteSaucisseBoard()
@@ -56,7 +57,7 @@ namespace IAOthelloMonnetPaysant
 
             var node = AlphaBeta(game,level,whiteTurn,WHITEISSTARTING,0);
             board = (int[,])saveMyBoard.Clone();
-
+            roundIterations++;
             return node.Move;
         }
 
@@ -79,7 +80,9 @@ namespace IAOthelloMonnetPaysant
             foreach(Tuple<int,int> move in moves)
             {
                 if(IsPlayable(move.Item1,move.Item2,whiteTurn))
+                {
                     PlayMove(move.Item1,move.Item2,whiteTurn);
+                }
                 Node children = AlphaBeta(game,depth - 1,!whiteTurn,-whoIsPlaying,round + 1,move,currentFitness + elderFitness);
 
                 if(children.Fitness * whoIsPlaying > currentNode.Fitness * whoIsPlaying)
@@ -96,23 +99,36 @@ namespace IAOthelloMonnetPaysant
         {
             //based on https://www.ultraboardgames.com/othello/tips.php#:~:text=While%20the%20move%20that%20flips,key%20to%20winning%20the%20game.
             //also based on http://www.radagast.se/othello/Help/strategy.html
-            //try to keep center, corner are good, avoid column and line before border column/line and try to go on the right
-            int[,] moveEvaluation ={
-                { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
-                { -20,   -20,   -1,     -1,     -1,     -1,     -1,     -20,    -20 },
-                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
-                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
-                { 2,    -1,     1,      5,      5,      5,      6,      0,      6   },
-                { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    6   },
-                { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
-            };
+            //try to keep center, corner are good, avoid column and line before border column/line and try to go on the right or the left if white or black
+            if(roundIterations<10){
+                int[,] moveEvaluationBegin = (whiteTurn ? new int[,]{
+                    { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
+                    { -20,   -20,   -1,     -1,     -1,     -1,     -1,     -20,    -20 },
+                    { 10,    -1,     1,      5,      5,      5,      6,      0,      10   },
+                    { 10,    -1,     1,      5,      5,      5,      6,      0,      10   },
+                    { 10,    -1,     1,      5,      5,      5,      6,      0,      10   },
+                    { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    10   },
+                    { 40,   -20,    2,      2,      2,      2,      2,      -20,    40  },
+                } : new int[,]{
+                    { 40,   -20,    10,      10,      10,      10,      10,      -20,    40  },
+                    { -20,   -20,   -1,     -1,     -1,     -1,     -1,     -20,    -20 },
+                    { 10,    0,     6,      5,      5,      5,      1,      -1,      10   },
+                    { 10,    0,     6,      5,      5,      5,      1,      -1,      10  },
+                    { 10,    0,     6,      5,      5,      5,      1,      -1,      10   },
+                    { -20,  -20,    -2,     -2,     -2,     -2,     -2,     -20,    10   },
+                    { 40,   -20,    10,      10,      10,      10,      10,      -20,    40  },
+                });
+            } else {
+
+            }
+            
 
             double fitness = whiteTurn ? GetWhiteScore() : GetBlackScore();
 
             if(move != null)
             {
-                fitness *= HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
                 fitness += moveEvaluation[move.Item2,move.Item1];
+                fitness += HowMuchToSwipe(move.Item2,move.Item1,whiteTurn);
             }
 
             return fitness;
@@ -136,14 +152,12 @@ namespace IAOthelloMonnetPaysant
                     if((iterationColumnIndex < BOARDWIDTH) && (iterationColumnIndex >= 0) && (iterationLineIndex < BOARDHEIGHT) && (iterationLineIndex >= 0)
                         && (board[iterationColumnIndex,iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
                     {
-                        int counter = 0;
                         while(((iterationColumnIndex + deltaColumn) < BOARDWIDTH) && (iterationColumnIndex + deltaColumn >= 0) &&
                                   ((iterationLineIndex + deltaLine) < BOARDHEIGHT) && ((iterationLineIndex + deltaLine >= 0))
                                    && (board[iterationColumnIndex,iterationLineIndex] == (int)(isWhite ? CellStatus.BLACK : CellStatus.WHITE)))
                         {
                             iterationColumnIndex += deltaColumn;
                             iterationLineIndex += deltaLine;
-                            counter++;
                             if(board[iterationColumnIndex,iterationLineIndex] == (int)((!isWhite) ? CellStatus.BLACK : CellStatus.WHITE))
                             {
                                 howMuch++;
