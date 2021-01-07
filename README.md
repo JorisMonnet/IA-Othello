@@ -2,7 +2,7 @@
 
 Notre fonction d'évaluation renvoit un entier(fitness) qui correspond à un poids d'une solution ou d'une autre dans notre arbre pour les trier ensuite.
 
-Cette fonction utillise deux principes, un tableau où on donne des poids suivant la position du coup à évaluer et une fonction qui calcule le nombre de pions de l'adversaire qui seront retournés par notre coup.
+Cette fonction utilise deux principes, un tableau où on donne des poids suivant la position du coup à évaluer et une fonction qui calcule le nombre de pions de l'adversaire qui seront retournés par notre coup.
 
 Le tableau de poids change au cours de la partie. Tout d'abord, au début suivant si on est blanc ou noir on va mettre un poids supérieur sur notre coté le plus proche pour pousser le jeu sur un coté. En effet, il est avantageux de prendre les bords qui ne sont attaquables par l'adversaire que par le bord et pas par l'intérieur.
 
